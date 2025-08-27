@@ -24,9 +24,9 @@ const Body = () => {
         <div className='flex h-[100vh] w-[100%] overflow-hidden  relative'>
             <Sidebar />
             <div className='w-[100vw] h-full bg-[#0e0e0f] flex flex-col'>
-                <div className='flex justify-between px-6 py-4 h-[70px] '>
+                <div className='flex justify-between px-6 py-4 h-[70px]  '>
                     <p className='text-xl text-gray-400 font-bold'>Gemini</p>
-                    <button className='bg-blue-300  px-6 rounded-lg'>Sign In</button>
+                    <button className='bg-blue-300  px-6 rounded-lg mr-4'>Sign In</button>
                 </div>
                 <div className='flex flex-col justify-center items-center mt-2 '>
 
@@ -67,7 +67,7 @@ const Body = () => {
 
                     </div>
                     <div className='relative'>
-                        <input type='text' className='h-[40px] w-[400px] md:h-[55px] lg:h-[65px] my-3 sm:w-[500px] md:w-[650px] lg:w-[850px] border-[1px] bg-[#0e0e0f] rounded-full border-gray-700 text-white text-center '
+                        <input type='text' className='h-[40px] w-[250px] md:h-[55px] lg:h-[65px] my-3 sm:w-[500px] md:w-[650px] lg:w-[850px] border-[1px] bg-[#0e0e0f] rounded-full border-gray-700 text-white text-center '
                             value={question}
                             onChange={(e) => setQuestion(e.target.value)} />
 

@@ -13,7 +13,7 @@ import { MdClear } from "react-icons/md";
 const Sidebar = () => {
 
     const { prevprompt, setPrevprompt, handleApi, setQuestion, setRecentprompt } = useContext(apiContext);
-    const [close, setClose] = useState(prevprompt);
+
 
     const loadPrompt = async (prompt) => {
         setRecentprompt(prompt);
@@ -38,12 +38,12 @@ const Sidebar = () => {
         <div>
             <div >
                 <div className='bg-[#282a2c] text-gray-400  h-[100vh] md:w-[17vw] flex flex-col w-[10vw]'>
-                    <div className=' md:flex  md:justify-between  p-4'>
+                    <div className='flex flex-col md:flex-row justify-center md:justify-between items-center p-4'>
                         <IoMenu className="w-5 h-5 my-2" />
                         <IoSearch className="w-5 h-5 my-2" />
                     </div>
                     <div className='flex md:gap-x-3 justify-start items-center md:px-5 lg:px-10 mt-10 '>
-                        <FaEdit className="w-5 h-5" />
+                        <FaEdit className="w-5 h-5 ml-2" />
                         <p className='hidden md:block md:text-[15px]'>New Chat</p>
                     </div>
                     <div className='flex flex-col  justify-start items-center w-full px-4 mt-10 h-[50%] '>
