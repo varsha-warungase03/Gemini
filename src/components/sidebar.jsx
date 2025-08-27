@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { IoMenu } from "react-icons/io5";
 import { IoSearch } from "react-icons/io5";
 import { FaEdit } from "react-icons/fa";
@@ -8,16 +8,29 @@ import { PiBagBold } from "react-icons/pi";
 import { IoIosSettings } from "react-icons/io";
 import { apiContext } from './apicontext';
 import { TiMessage } from "react-icons/ti";
+import { MdClear } from "react-icons/md";
 
 const Sidebar = () => {
 
-    const { prevprompt, handleApi, setQuestion, setRecentprompt } = useContext(apiContext);
+    const { prevprompt, setPrevprompt, handleApi, setQuestion, setRecentprompt } = useContext(apiContext);
+    const [close, setClose] = useState(prevprompt);
 
     const loadPrompt = async (prompt) => {
         setRecentprompt(prompt);
         await handleApi(prompt, "history");
 
         setQuestion("");
+    }
+
+    // const removeitem = (id) => {
+    //     setClose(close.filter((_, index) => index !== id));
+    // }
+
+    const handleRemovePrompt = (e, index) => {
+        // Remove prompt at specific index
+        e.stopPropagation();
+        const updatedPrompts = prevprompt.filter((_, i) => i !== index);
+        setPrevprompt(updatedPrompts);
     }
 
 
@@ -35,10 +48,11 @@ const Sidebar = () => {
                     </div>
                     <div className='flex flex-col  justify-start items-center w-full px-4 mt-10 h-[50%] '>
                         <p className=' md:font-bold hidden  md:block'>Recent</p>
+
                         <div className='hide-scrollbar overflow-y-auto md:w-full hidden md:block'>
                             {prevprompt.map((item, index) => {
                                 return (
-                                    <div key={index} className='flex gap-x-3 mt-2  h-8 border-[1px] border-gray-600 rounded-lg w-full justify-start over flow-x-auto items-center px-2' onClick={() => loadPrompt(item)}>
+                                    <div key={index} className='flex gap-x-3 mt-2  h-8 border-[1px] border-gray-600 rounded-lg w-full justify-between over flow-x-auto items-center px-2' onClick={() => loadPrompt(item)}>
                                         <TiMessage className='w-5 h-5' />
 
                                         <p className="hidden lg:block text-[17px]">
@@ -51,6 +65,7 @@ const Sidebar = () => {
                                         <p className="block md:hidden text-[15px]">
                                             {item.slice(0, 5)}...
                                         </p>
+                                        <MdClear className='w-5 h-5 ' onClick={(e) => handleRemovePrompt(e, index)} />
                                     </div>
                                 )
                             })}
