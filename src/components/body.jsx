@@ -30,14 +30,14 @@ const Body = () => {
                 </div>
                 <div className='flex flex-col justify-center items-center mt-2 '>
 
-                    <div className=' w-[280px] sm:w-[500px] text-[12px]  h-[75vh] mt-5 md:w-[650px] lg:w-[850px] rounded-lg text-white md:font-semibold overflow-y-auto hide-scrollbar  flex  gap-3 '>
+                    <div className=' w-[280px] sm:w-[500px] text-[12px] md:text-[18px] h-[75vh] mt-5 md:w-[650px] lg:w-[850px] rounded-lg text-white md:font-semibold overflow-y-auto hide-scrollbar  flex  gap-3 '>
 
 
                         <div className='flex flex-col w-full'>
                             {result.map((item, index) => (
-                                <>
+                                <React.Fragment key={index}>
                                     <div
-                                        key={index}
+
                                         className={`max-w-[100%] px-2 lg:px-8 md:px-6 py-2 rounded-b-3xl rounded-l-3xl m-5 ${item.type === 'q'
                                             ? 'self-end text-right bg-gray-500'
                                             : 'self-start text-left '
@@ -48,26 +48,36 @@ const Body = () => {
                                         {item.type === 'q' ? (
                                             <p>{item.text}</p>
                                         ) : (
-                                            <div className='flex gap-x-5'>
+                                            <div className='flex gap-x-5 '>
                                                 <RiGeminiFill className='text-blue-400 w-6 h-6 ' />
+                                                {loading && index === result.length - 1 && <div className='self-start text-left text-[12px] md:text-[18px] text-white px-8 py-2'>
+                                                    Just a sec..
+                                                </div>}
                                                 <div dangerouslySetInnerHTML={{ __html: item.text }}
                                                     className="text-gray-200" />
                                             </div>
                                         )}
                                     </div>
-                                    {loading && index === result.length - 1 && item.type === 'q' && (
-                                        <div className='self-start text-left text-sm text-gray-400 px-8 py-2'>
-                                            Just a sec...
-                                        </div>
-                                    )}
-                                </>
+                                </React.Fragment>
 
                             ))}
+
+                            {/* {loading && (
+                                <div className='self-start text-left px-2 lg:px-8 md:px-6 py-2 rounded-b-3xl rounded-l-3xl m-5 text-white bg-[#1e1e20]'>
+
+
+                                    <div className="text-gray-200">
+                                        {formattedAnswer}
+                                    </div>
+
+                                </div>
+                            )} */}
+
                         </div>
 
                     </div>
                     <div className='relative'>
-                        <input type='text' className='h-[40px] w-[250px] md:h-[50px] lg:h-[55px] my-3 sm:w-[500px] md:w-[620px] lg:w-[800px] border-[1px] bg-[#0e0e0f] rounded-full border-gray-700 text-white text-center '
+                        <input type='text' className='h-[40px] w-[250px] md:h-[50px] lg:h-[55px] my-3 sm:w-[500px] md:w-[620px] lg:w-[800px] border-[1px] bg-[#0e0e0f] rounded-full border-gray-700 text-white outline-none  text-center '
                             value={question}
                             onChange={(e) => setQuestion(e.target.value)} />
 
