@@ -14,11 +14,7 @@ const ContextProvider = ({ children }) => {
     const [question, setQuestion] = useState("");
 
 
-    // let payload = {
-    //     "contents": [{
-    //         "parts": [{ "text": "give me 4 sum dsa question code " }]
-    //     }]
-    // }
+
 
     const delaypara = (index, nextword, speed) => {
         setTimeout(function () {
@@ -27,6 +23,7 @@ const ContextProvider = ({ children }) => {
     }
 
     const handleApi = async (prompt, source = "new") => {
+
 
         setFormattedAnswer("");
         let payload = {

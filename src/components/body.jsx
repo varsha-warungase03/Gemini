@@ -24,7 +24,7 @@ const Body = () => {
         <div className='flex h-[100vh] w-[100%] overflow-hidden  relative'>
             <Sidebar />
             <div className='w-[100vw] h-full bg-[#0e0e0f] flex flex-col'>
-                <div className='flex justify-between px-6 py-4 h-[70px] bg-pink-500'>
+                <div className='flex justify-between px-6 py-4 h-[70px] '>
                     <p className='text-xl text-gray-400 font-bold'>Gemini</p>
                     <button className='bg-blue-300  px-6 rounded-lg'>Sign In</button>
                 </div>
