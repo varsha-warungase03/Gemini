@@ -55,13 +55,15 @@ const Sidebar = () => {
                                     <div key={index} className='flex gap-x-3 mt-2  h-8 border-[1px] border-gray-600 rounded-lg w-full justify-between over flow-x-auto items-center px-2' onClick={() => loadPrompt(item)}>
                                         <TiMessage className='w-5 h-5' />
 
-                                        <p className="hidden lg:block text-[17px]">
-                                            {item.slice(0, 10)}.....
+                                        <p className="hidden xl:block text-[17px]">
+                                            {item.slice(0, 12)}...
+                                        </p>
+                                        <p className="hidden lg:block xl:hidden text-[17px]">
+                                            {item.slice(0, 5)}...
                                         </p>
                                         <p className="hidden md:block lg:hidden text-[15px]">
                                             {item.slice(0, 5)}...
                                         </p>
-
                                         <p className="block md:hidden text-[15px]">
                                             {item.slice(0, 5)}...
                                         </p>
