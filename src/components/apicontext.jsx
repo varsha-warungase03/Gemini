@@ -1,132 +1,139 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useRef } from "react";
 import { url } from "../key";
 import { formatApiResponse } from "./format";
 
 export const apiContext = createContext();
 
 const ContextProvider = ({ children }) => {
+  const [result, setResult] = useState([]);
+  const [recentprompt, setRecentprompt] = useState("");
+  const [prevprompt, setPrevprompt] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [question, setQuestion] = useState("");
 
-    const [formattedAnswer, setFormattedAnswer] = useState("");
-    const [result, setResult] = useState([]);
-    const [recentprompt, setRecentprompt] = useState("");
-    const [prevprompt, setPrevprompt] = useState([])
-    const [loading, setLoading] = useState(false);
-    const [question, setQuestion] = useState("");
+  // debounce reference
+  const apiTimeoutRef = useRef(null);
 
+  // typing animation
+  const delaypara = (index, word, speed, isLast) => {
+    setTimeout(() => {
+      setResult((prev) => {
+        const updated = [...prev];
+        const lastIndex = updated.length - 1;
 
+        if (updated[lastIndex]?.type === "a") {
+          updated[lastIndex] = {
+            ...updated[lastIndex],
+            text: updated[lastIndex].text + word,
+          };
+        }
+        return updated;
+      });
 
+      if (isLast) {
+        setLoading(false);
+      }
+    }, speed * index);
+  };
 
-    const delaypara = (index, nextword, speed, isLast) => {
-        // setTimeout(function () {
-        //     setFormattedAnswer(prev => prev + nextword);
-        // }, speed * index)
+  const handleApi = (prompt, source = "new") => {
+    // debounce to prevent spam
+    clearTimeout(apiTimeoutRef.current);
 
-        setTimeout(() => {
-            setResult((prev) => {
-                const updated = [...prev];
-                const lastIndex = updated.length - 1;
-                if (updated[lastIndex]?.type === "a") {
-                    updated[lastIndex] = {
-                        ...updated[lastIndex],
-                        text: updated[lastIndex].text + nextword,
-                    };
-                }
-                return updated;
+    apiTimeoutRef.current = setTimeout(async () => {
+      if (!prompt?.trim()) return;
 
-            });
-            if (isLast) {
-                setLoading(false);
-            }
-        }, speed * index);
-    }
+      setLoading(true);
+      setRecentprompt(prompt);
 
+      if (source === "new") {
+        setPrevprompt((prev) =>
+          prev.includes(prompt) ? prev : [...prev, prompt]
+        );
+      }
 
+      // add question + empty answer
+      setResult((prev) => [
+        ...prev,
+        { type: "q", text: prompt },
+        { type: "a", text: "" },
+      ]);
 
-    const handleApi = async (prompt, source = "new") => {
+      try {
+        const payload = {
+          contents: [{ parts: [{ text: prompt }] }],
+        };
 
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
 
-        setFormattedAnswer("");
-        setLoading(true);
-        setRecentprompt(prompt);
-
-
-        if (source === "new") {
-            // Only add if not already present
-            setPrevprompt((prev) =>
-                prev.includes(prompt) ? prev : [...prev, prompt]
-            );
+        // handle rate limit / server errors
+        if (!res.ok) {
+          throw new Error(`API Error: ${res.status}`);
         }
 
-        // const updatedResult = [...result, { type: "q", text: prompt }, { type: "loading" }];
-        // setResult(updatedResult);
+        const data = await res.json();
 
-        setResult(prev => [...prev, { type: "q", text: prompt }, { type: "a", text: "" }]);
-
-        try {
-
-            let payload = {
-                contents: [{ parts: [{ text: prompt }] }]
-            };
-
-            let response = await fetch(url, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            })
-
-            response = await response.json();
-            let rawtext = response.candidates[0].content.parts[0].text;
-            let cleardata = formatApiResponse(rawtext);
-
-
-
-            for (let i = 0; i < cleardata.length; i++) {
-                delaypara(i, cleardata[i], 10, i === 0);
-            }
-
-
-
-            // const updatedResult = [
-            //     ...result,
-            //     { type: "q", text: prompt },
-            //     { type: "a", text: cleardata },
-            // ];
-            // setResult(updatedResult);
-
-
-            setTimeout(() => {
-                setLoading(false);
-            }, cleardata.length * 10 + 200);
-
-
-
-        } catch (error) {
-            console.error("API Error:", error);
+        // SAFE GUARD (prevents crash)
+        if (!data.candidates || !data.candidates.length) {
+          throw new Error("No response from Gemini (quota or error)");
         }
-    }
 
-    let value = {
-        handleApi,
-        formattedAnswer,
-        loading,
-        setLoading,
-        recentprompt,
-        prevprompt,
-        setRecentprompt,
-        setPrevprompt,
-        question,
-        setQuestion,
-        result,
-        setResult
-    }
+        const rawText =
+          data.candidates[0].content.parts[0].text || "";
 
-    return (
-        <div>
-            <apiContext.Provider value={value}>
-                {children}
-            </apiContext.Provider>
-        </div>
-    )
+        const cleanData = formatApiResponse(rawText);
 
-}
+        for (let i = 0; i < cleanData.length; i++) {
+          delaypara(
+            i,
+            cleanData[i],
+            10,
+            i === cleanData.length - 1
+          );
+        }
+      } catch (error) {
+        console.error(error.message);
+
+        setResult((prev) => {
+          const updated = [...prev];
+          const lastIndex = updated.length - 1;
+
+          if (updated[lastIndex]?.type === "a") {
+            updated[lastIndex].text =
+              "⚠️ Too many requests. Please wait and try again.";
+          }
+          return updated;
+        });
+
+        setLoading(false);
+      }
+    }, 800); // debounce delay
+  };
+
+  const value = {
+    handleApi,
+    loading,
+    recentprompt,
+    prevprompt,
+    setRecentprompt,
+    setPrevprompt,
+    question,
+    setQuestion,
+    result,
+    setResult,
+  };
+
+  return (
+    <apiContext.Provider value={value}>
+      {children}
+    </apiContext.Provider>
+  );
+};
 
 export default ContextProvider;
